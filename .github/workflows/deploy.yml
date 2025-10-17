@@ -32,8 +32,8 @@ jobs:
           NODE_ENV: production
         run: |
           cd frontend
-          npm ci --legacy-peer-deps
-          npm run build
+          npm install
+          ./node_modules/.bin/vite build
           ls -la dist/
 
       - name: 部署前端到静态网站托管
