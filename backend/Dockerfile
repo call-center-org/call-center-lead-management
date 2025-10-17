@@ -7,7 +7,13 @@ WORKDIR /app
 # 设置环境变量
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    FLASK_APP=run.py
+    FLASK_APP=run.py \
+    PIP_INDEX_URL=https://mirrors.cloud.tencent.com/pypi/simple \
+    PIP_TRUSTED_HOST=mirrors.cloud.tencent.com
+
+# 更换apt源为腾讯云镜像（加速）
+RUN sed -i 's/deb.debian.org/mirrors.cloud.tencent.com/g' /etc/apt/sources.list && \
+    sed -i 's/security.debian.org/mirrors.cloud.tencent.com/g' /etc/apt/sources.list
 
 # 安装系统依赖
 RUN apt-get update && apt-get install -y \
@@ -18,9 +24,9 @@ RUN apt-get update && apt-get install -y \
 # 复制requirements文件
 COPY requirements.txt .
 
-# 安装Python依赖
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+# 安装Python依赖（使用腾讯云PyPI镜像）
+RUN pip install --no-cache-dir --upgrade pip -i https://mirrors.cloud.tencent.com/pypi/simple && \
+    pip install --no-cache-dir -r requirements.txt -i https://mirrors.cloud.tencent.com/pypi/simple
 
 # 复制应用代码
 COPY . .
