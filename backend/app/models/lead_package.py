@@ -76,7 +76,7 @@ class LeadPackage(db.Model):
     def calculate_metrics(self):
         """
         计算数据包指标
-        
+
         接通率计算逻辑：
         - 如果有实际通话记录，从通话记录中动态计算
         - 接通率 = 接通数量 / 外呼数量
@@ -85,23 +85,23 @@ class LeadPackage(db.Model):
         # 计算总成本
         if self.cost_per_lead > 0:
             self.total_cost = self.total_leads * self.cost_per_lead
-        
+
         # 从实际通话记录计算接通率
         from app.models.call import Call
-        
+
         # 获取该数据包下所有任务的所有通话记录
         total_calls = 0
         connected_calls = 0
-        
+
         for task in self.dial_tasks:
             task_calls = Call.query.filter_by(task_id=task.id).all()
             total_calls += len(task_calls)
-            
+
             # 统计接通数：result='connected' 或 duration > 0
             for call in task_calls:
                 if call.result == "connected" or (call.duration and call.duration > 0):
                     connected_calls += 1
-        
+
         # 计算接通率
         if total_calls > 0:
             self.contact_rate = connected_calls / total_calls
@@ -112,11 +112,11 @@ class LeadPackage(db.Model):
                 # 可以基于有效线索数估算一个初始值
                 if self.total_leads > 0:
                     self.contact_rate = min(self.valid_leads / self.total_leads, 1.0)
-    
+
     def get_call_statistics(self):
         """
         获取通话统计信息（只读，不修改数据库）
-        
+
         返回：
         {
             'total_calls': 外呼总数,
@@ -126,20 +126,20 @@ class LeadPackage(db.Model):
         }
         """
         from app.models.call import Call
-        
+
         total_calls = 0
         connected_calls = 0
-        
+
         for task in self.dial_tasks:
             task_calls = Call.query.filter_by(task_id=task.id).all()
             total_calls += len(task_calls)
-            
+
             for call in task_calls:
                 if call.result == "connected" or (call.duration and call.duration > 0):
                     connected_calls += 1
-        
+
         contact_rate = (connected_calls / total_calls) if total_calls > 0 else 0.0
-        
+
         return {
             "total_calls": total_calls,
             "connected_calls": connected_calls,

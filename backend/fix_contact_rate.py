@@ -30,9 +30,7 @@ def fix_contact_rates():
                 package.contact_rate = 0.0
                 package.interest_rate = 0.0
 
-                print(
-                    f"✅ 修复: {package.name} - 接通率从 {old_rate:.2%} 改为 0.00%"
-                )
+                print(f"✅ 修复: {package.name} - 接通率从 {old_rate:.2%} 改为 0.00%")
                 fixed_count += 1
             else:
                 # 有通话记录，从通话数据计算
@@ -56,4 +54,5 @@ def fix_contact_rates():
 
 if __name__ == "__main__":
     fix_contact_rates()
+
 
