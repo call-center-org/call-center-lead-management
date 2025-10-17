@@ -26,8 +26,8 @@ const Dashboard = () => {
       // 获取仪表盘数据
       const response = await apiClient.get("/metrics/dashboard");
       
-      if (response.data.success) {
-        const { summary, recent_packages } = response.data.data;
+      if (response.success) {
+        const { summary, recent_packages } = response.data;
         
         setMetrics({
           totalPackages: summary.total_packages || 0,
