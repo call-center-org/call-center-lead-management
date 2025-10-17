@@ -28,6 +28,8 @@ jobs:
           tcb -v
 
       - name: 构建前端
+        env:
+          NODE_ENV: production
         run: |
           cd frontend
           npm install
