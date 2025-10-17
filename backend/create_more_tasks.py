@@ -200,9 +200,7 @@ def create_more_tasks():
 
             # 重新计算数据包指标
             package.calculate_metrics()
-            print(
-                f"  📊 创建{num_tasks}个任务 - 接通率: {package.contact_rate:.2f}%\n"
-            )
+            print(f"  📊 创建{num_tasks}个任务 - 接通率: {package.contact_rate:.2f}%\n")
 
         # 提交所有更改
         db.session.commit()
@@ -227,4 +225,3 @@ def create_more_tasks():
 
 if __name__ == "__main__":
     create_more_tasks()
-

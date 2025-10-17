@@ -225,15 +225,75 @@ const PackageDetail = () => {
         {tagSummaries.length === 0 ? (
           <p className="text-gray-500 text-center py-8">暂无标签统计数据</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {tagSummaries.map((summary, index) => (
-              <div key={index} className="border rounded-lg p-4">
-                <p className="text-sm text-gray-600">{summary.tag_name}</p>
-                <p className="text-2xl font-bold text-primary mt-2">
-                  {formatNumber(summary.tag_count || 0)}
-                </p>
-              </div>
-            ))}
+          <div className="space-y-6">
+            {(() => {
+              // 按 tag_name 分组
+              const groupedTags = {};
+              tagSummaries.forEach((summary) => {
+                if (!groupedTags[summary.tag_name]) {
+                  groupedTags[summary.tag_name] = [];
+                }
+                groupedTags[summary.tag_name].push(summary);
+              });
+
+              return Object.entries(groupedTags).map(([tagName, tags]) => (
+                <div key={tagName} className="border rounded-lg p-4">
+                  <h4 className="font-semibold text-lg mb-4 text-gray-700">{tagName}</h4>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {tags.map((tag, index) => {
+                      const percentage = (tag.percentage * 100).toFixed(1);
+                      
+                      // 根据标签值选择颜色
+                      let bgColor = 'bg-gray-100';
+                      let textColor = 'text-gray-700';
+                      let barColor = 'bg-gray-400';
+                      
+                      if (tag.tag_value === 'high' || tag.tag_value === '科技' || tag.tag_value === '金融') {
+                        bgColor = 'bg-red-50';
+                        textColor = 'text-red-700';
+                        barColor = 'bg-red-500';
+                      } else if (tag.tag_value === 'medium' || tag.tag_value === '教育' || tag.tag_value === '医疗') {
+                        bgColor = 'bg-yellow-50';
+                        textColor = 'text-yellow-700';
+                        barColor = 'bg-yellow-500';
+                      } else if (tag.tag_value === 'low' || tag.tag_value === '制造' || tag.tag_value === '零售') {
+                        bgColor = 'bg-green-50';
+                        textColor = 'text-green-700';
+                        barColor = 'bg-green-500';
+                      }
+                      
+                      return (
+                        <div key={index} className={`${bgColor} rounded-lg p-3`}>
+                          <div className="flex justify-between items-center mb-2">
+                            <span className={`font-medium ${textColor}`}>
+                              {tag.tag_value}
+                            </span>
+                            <span className="text-sm font-mono text-gray-600">
+                              {formatNumber(tag.tag_count)}
+                            </span>
+                          </div>
+                          
+                          {/* 进度条 */}
+                          <div className="relative w-full h-2 bg-white rounded-full overflow-hidden">
+                            <div
+                              className={`h-full ${barColor} rounded-full transition-all`}
+                              style={{ width: `${percentage}%` }}
+                            ></div>
+                          </div>
+                          
+                          <div className="mt-1 text-right">
+                            <span className="text-xs font-semibold text-gray-600">
+                              {percentage}%
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ));
+            })()}
           </div>
         )}
       </div>
