@@ -1,0 +1,32 @@
+# Flask 核心框架
+Flask==2.3.3
+Flask-CORS==4.0.0
+
+# 数据库 ORM
+SQLAlchemy==2.0.21
+Flask-SQLAlchemy==3.0.5
+Flask-Migrate==4.0.5
+
+# JWT 认证
+PyJWT==2.8.0
+Flask-JWT-Extended==4.5.2
+
+# 环境变量管理
+python-dotenv==1.0.0
+
+# 数据验证
+marshmallow==3.20.1
+Flask-Marshmallow==0.15.0
+
+# 数据库驱动
+# SQLite (内置，开发环境)
+# psycopg2-binary==2.9.7  # PostgreSQL (生产环境，按需取消注释)
+
+# 工具库
+python-dateutil==2.8.2
+
+# 开发工具
+pytest==7.4.2
+pytest-flask==1.2.0
+pytest-cov==4.1.0
+
