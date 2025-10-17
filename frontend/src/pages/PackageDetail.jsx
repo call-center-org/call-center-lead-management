@@ -219,13 +219,13 @@ const PackageDetail = () => {
       </div>
 
       {/* 标签统计 */}
-      <div className="bg-white rounded-lg shadow-card p-card">
-        <h3 className="text-xl font-semibold mb-4">标签统计</h3>
+      <div className="bg-white rounded-lg shadow-card p-4">
+        <h3 className="text-lg font-semibold mb-3">标签统计</h3>
         
         {tagSummaries.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">暂无标签统计数据</p>
+          <p className="text-gray-500 text-center py-4 text-sm">暂无标签统计数据</p>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-3">
             {(() => {
               // 按标签分类分组（基于标签代码前缀）
               const groupedTags = {
@@ -253,58 +253,57 @@ const PackageDetail = () => {
                 if (tags.length === 0) return null;
                 
                 return (
-                  <div key={categoryName} className="border rounded-lg p-4">
-                    <h4 className="font-semibold text-lg mb-4 text-gray-700">{categoryName}</h4>
+                  <div key={categoryName} className="border rounded p-2">
+                    <h4 className="font-medium text-sm mb-2 text-gray-700">{categoryName}</h4>
                     
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
                       {tags.map((tag, index) => {
                         const percentage = (tag.percentage * 100).toFixed(1);
                         
                         // 根据标签分类选择颜色
-                        let bgColor = 'bg-gray-100';
-                        let textColor = 'text-gray-700';
+                        let bgColor = 'bg-gray-50';
+                        let textColor = 'text-gray-600';
                         let barColor = 'bg-gray-400';
                         
                         if (categoryName === '成功类') {
                           bgColor = 'bg-green-50';
-                          textColor = 'text-green-700';
+                          textColor = 'text-green-600';
                           barColor = 'bg-green-500';
                         } else if (categoryName === '可跟进类') {
                           bgColor = 'bg-blue-50';
-                          textColor = 'text-blue-700';
+                          textColor = 'text-blue-600';
                           barColor = 'bg-blue-500';
                         } else if (categoryName === '无效类') {
                           bgColor = 'bg-red-50';
-                          textColor = 'text-red-700';
+                          textColor = 'text-red-600';
                           barColor = 'bg-red-500';
                         }
                         
                         return (
-                          <div key={index} className={`${bgColor} rounded-lg p-3`}>
-                            <div className="flex justify-between items-start mb-2">
-                              <div className="flex-1">
-                                <span className={`text-xs font-bold ${textColor}`}>
-                                  {tag.tag_name}
-                                </span>
-                                <span className={`block text-sm font-medium ${textColor} mt-1`}>
-                                  {tag.tag_value}
-                                </span>
-                              </div>
-                              <span className="text-sm font-mono font-semibold text-gray-700 ml-2">
+                          <div key={index} className={`${bgColor} rounded p-2`}>
+                            <div className="flex justify-between items-center mb-1">
+                              <span className={`text-xs font-bold ${textColor}`}>
+                                {tag.tag_name}
+                              </span>
+                              <span className="text-xs font-mono font-semibold text-gray-600">
                                 {formatNumber(tag.tag_count)}
                               </span>
                             </div>
                             
+                            <div className={`text-xs ${textColor} mb-1 truncate`} title={tag.tag_value}>
+                              {tag.tag_value}
+                            </div>
+                            
                             {/* 进度条 */}
-                            <div className="relative w-full h-2 bg-white rounded-full overflow-hidden">
+                            <div className="relative w-full h-1 bg-white rounded-full overflow-hidden">
                               <div
                                 className={`h-full ${barColor} rounded-full transition-all`}
                                 style={{ width: `${percentage}%` }}
                               ></div>
                             </div>
                             
-                            <div className="mt-1 text-right">
-                              <span className="text-xs font-semibold text-gray-600">
+                            <div className="mt-0.5 text-right">
+                              <span className="text-xs text-gray-500">
                                 {percentage}%
                               </span>
                             </div>
