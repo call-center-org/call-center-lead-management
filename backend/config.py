@@ -64,13 +64,15 @@ class ProductionConfig(Config):
     if not SECRET_KEY:
         raise ValueError("生产环境必须设置 SECRET_KEY 环境变量")
 
-    # 生产环境使用 PostgreSQL
+    # 生产环境数据库配置
+    # 优先使用 DATABASE_URL，如果未设置则使用 SQLite（仅用于测试）
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
     if not SQLALCHEMY_DATABASE_URI:
-        raise ValueError("生产环境必须设置 DATABASE_URL 环境变量")
-
+        print("⚠️  警告: 生产环境未设置 DATABASE_URL，使用 SQLite（数据可能在容器重启时丢失）")
+        SQLALCHEMY_DATABASE_URI = "sqlite:///lead_management_prod.db"
+    
     # PostgreSQL URL 修复（Heroku/Railway 兼容）
-    if SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
+    elif SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
         SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace(
             "postgres://", "postgresql://", 1
         )

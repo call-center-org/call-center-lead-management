@@ -1,5 +1,6 @@
 export const API_CONFIG = {
-  BASE_URL: "/api", // 代理到后端
+  // 开发环境使用代理 /api，生产环境使用 /lead-api
+  BASE_URL: import.meta.env.MODE === "production" ? "/lead-api" : "/api",
   AUTH: {
     type: "Bearer",
   },

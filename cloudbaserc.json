@@ -1,16 +1,16 @@
 {
   "$schema": "https://framework-1258016615.tcloudbaseapp.com/schema/latest.json",
   "version": "2.0",
-  "envId": "{{envId}}",
+  "envId": "cloud1-6gt5ulxm10210d0f",
   "framework": {
     "name": "call-center-lead-management",
     "plugins": {
       "frontend": {
         "use": "@cloudbase/framework-plugin-website",
         "inputs": {
-          "buildCommand": "npm run build",
+          "buildCommand": "cd frontend && npm install && npm run build",
           "outputPath": "frontend/dist",
-          "cloudPath": "/",
+          "cloudPath": "/lead-management",
           "ignore": [
             ".git",
             ".gitignore",
@@ -23,14 +23,13 @@
         "use": "@cloudbase/framework-plugin-container",
         "inputs": {
           "serviceName": "lead-management-api",
-          "servicePath": "/api",
+          "servicePath": "/lead-api",
           "dockerfilePath": "backend/Dockerfile",
           "containerPort": 5002,
           "envVariables": {
             "FLASK_ENV": "production",
-            "DATABASE_URL": "{{DATABASE_URL}}",
-            "SECRET_KEY": "{{SECRET_KEY}}",
-            "JWT_SECRET_KEY": "{{JWT_SECRET_KEY}}"
+            "SECRET_KEY": "8e359590ab5268b7b7854530fbd96cf96828f699aa08d2bbf8d2f6e373c1b5c8",
+            "JWT_SECRET_KEY": "b51b16d085809f4e32fc7c0e701f14dd129f241ff83975e50013ed12b80c27c4"
           }
         }
       }
