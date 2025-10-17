@@ -11,7 +11,7 @@ from app.models import User, LeadPackage, DialTask
 def app():
     """创建测试应用"""
     app = create_app("testing")
-    
+
     with app.app_context():
         db.create_all()
         yield app
@@ -43,22 +43,19 @@ def auth_headers(client):
     """创建认证headers（包含有效的JWT token）"""
     # 创建测试用户
     user = User.create_user(
-        username="testuser",
-        email="test@example.com",
-        password="testpass123"
+        username="testuser", email="test@example.com", password="testpass123"
     )
     db.session.add(user)
     db.session.commit()
-    
+
     # 登录获取token
-    response = client.post("/api/auth/login", json={
-        "username": "testuser",
-        "password": "testpass123"
-    })
-    
+    response = client.post(
+        "/api/auth/login", json={"username": "testuser", "password": "testpass123"}
+    )
+
     data = response.get_json()
     token = data["data"]["access_token"]
-    
+
     return {"Authorization": f"Bearer {token}"}
 
 
@@ -69,7 +66,7 @@ def sample_user():
         username="sampleuser",
         email="sample@example.com",
         password="sample123",
-        full_name="Sample User"
+        full_name="Sample User",
     )
     db.session.add(user)
     db.session.commit()
@@ -86,7 +83,7 @@ def sample_package():
         region="江苏",
         total_leads=1000,
         valid_leads=900,
-        cost_per_lead=1.0
+        cost_per_lead=1.0,
     )
     db.session.add(package)
     db.session.commit()
@@ -97,15 +94,14 @@ def sample_package():
 def sample_task(sample_package):
     """创建示例外呼任务"""
     from datetime import datetime
-    
+
     task = DialTask(
         package_id=sample_package.id,
         task_name="测试任务",
         description="测试任务描述",
         start_time=datetime(2025, 10, 17, 9, 0, 0),
-        status="pending"
+        status="pending",
     )
     db.session.add(task)
     db.session.commit()
     return task
-

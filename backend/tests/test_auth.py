@@ -64,7 +64,11 @@ class TestUserRegistration:
         """测试密码过短"""
         response = client.post(
             "/api/auth/register",
-            json={"username": "testuser", "email": "test@example.com", "password": "123"},
+            json={
+                "username": "testuser",
+                "email": "test@example.com",
+                "password": "123",
+            },
         )
 
         assert response.status_code == 400
@@ -154,4 +158,3 @@ class TestProtectedRoutes:
         assert data["success"] is True
         assert data["data"]["full_name"] == "Updated Name"
         assert data["data"]["email"] == "updated@example.com"
-

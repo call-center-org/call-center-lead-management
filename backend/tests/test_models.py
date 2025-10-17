@@ -108,7 +108,9 @@ class TestLeadPackageModel:
         # 验证接通率：1个接通 / 2个通话 = 0.5
         assert sample_package.contact_rate == 0.5  # 1/2
         # 验证总成本已计算
-        assert sample_package.total_cost == 1000.0  # total_leads * cost_per_lead = 1000 * 1.0
+        assert (
+            sample_package.total_cost == 1000.0
+        )  # total_leads * cost_per_lead = 1000 * 1.0
 
 
 class TestDialTaskModel:
@@ -143,4 +145,3 @@ class TestDialTaskModel:
         """测试任务和数据包的关系"""
         assert sample_task.package.id == sample_package.id
         assert sample_task in sample_package.dial_tasks.all()
-

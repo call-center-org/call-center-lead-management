@@ -68,9 +68,11 @@ class ProductionConfig(Config):
     # 优先使用 DATABASE_URL，如果未设置则使用 SQLite（仅用于测试）
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
     if not SQLALCHEMY_DATABASE_URI:
-        print("⚠️  警告: 生产环境未设置 DATABASE_URL，使用 SQLite（数据可能在容器重启时丢失）")
+        print(
+            "⚠️  警告: 生产环境未设置 DATABASE_URL，使用 SQLite（数据可能在容器重启时丢失）"
+        )
         SQLALCHEMY_DATABASE_URI = "sqlite:///lead_management_prod.db"
-    
+
     # PostgreSQL URL 修复（Heroku/Railway 兼容）
     elif SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
         SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace(

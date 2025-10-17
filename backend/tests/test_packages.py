@@ -52,7 +52,9 @@ class TestPackageCreate:
         data = response.get_json()
         assert data["success"] is True
         assert data["data"]["name"] == "新数据包"
-        assert data["data"]["total_cost"] == 750.0  # total_leads * cost_per_lead = 500 * 1.5
+        assert (
+            data["data"]["total_cost"] == 750.0
+        )  # total_leads * cost_per_lead = 500 * 1.5
 
     def test_create_package_missing_fields(self, client):
         """测试缺少必填字段"""
@@ -133,4 +135,3 @@ class TestPackageDelete:
         response = client.delete("/api/packages/99999")
 
         assert response.status_code == 404
-
