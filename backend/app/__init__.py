@@ -63,8 +63,9 @@ def create_app(config_name=None):
 
 def register_blueprints(app):
     """注册蓝图"""
-    from app.routes import packages_bp, tasks_bp, metrics_bp, data_bp
+    from app.routes import auth_bp, packages_bp, tasks_bp, metrics_bp, data_bp
 
+    app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(packages_bp, url_prefix="/api/packages")
     app.register_blueprint(tasks_bp, url_prefix="/api/tasks")
     app.register_blueprint(metrics_bp, url_prefix="/api/metrics")
