@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# 测试
+.pytest_cache/
+.coverage
+htmlcov/
+tests/
+
+# 数据库
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# 日志
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+
+# 其他
+.DS_Store
+.env
+.env.local
+*.md
+

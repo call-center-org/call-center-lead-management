@@ -20,10 +20,14 @@ Flask-Marshmallow==0.15.0
 
 # 数据库驱动
 # SQLite (内置，开发环境)
-# psycopg2-binary==2.9.7  # PostgreSQL (生产环境，按需取消注释)
+psycopg2-binary==2.9.7  # PostgreSQL (生产环境)
+
+# WSGI服务器
+gunicorn==21.2.0
 
 # 工具库
 python-dateutil==2.8.2
+requests==2.31.0
 
 # 开发工具
 pytest==7.4.2
