@@ -10,11 +10,22 @@ from flask_jwt_extended import (
     get_jwt_identity,
     get_jwt,
 )
+from marshmallow import ValidationError
 from datetime import datetime
 from app import db
 from app.models import User
+from app.schemas import (
+    UserRegistrationSchema,
+    UserLoginSchema,
+    UserUpdateSchema,
+)
 
 auth_bp = Blueprint("auth", __name__)
+
+# 初始化Schema实例
+user_registration_schema = UserRegistrationSchema()
+user_login_schema = UserLoginSchema()
+user_update_schema = UserUpdateSchema()
 
 
 @auth_bp.route("/register", methods=["POST"])
@@ -32,14 +43,16 @@ def register():
     """
     data = request.get_json()
 
-    # 验证必填字段
-    if not data or not data.get("username") or not data.get("email") or not data.get("password"):
-        return jsonify({"success": False, "error": "缺少必填字段"}), 400
+    # 使用Schema验证数据
+    try:
+        validated_data = user_registration_schema.load(data)
+    except ValidationError as err:
+        return jsonify({"success": False, "error": "数据验证失败", "details": err.messages}), 400
 
-    username = data["username"]
-    email = data["email"]
-    password = data["password"]
-    full_name = data.get("full_name")
+    username = validated_data["username"]
+    email = validated_data["email"]
+    password = validated_data["password"]
+    full_name = validated_data.get("full_name")
 
     # 检查用户名是否已存在
     if User.query.filter_by(username=username).first():
@@ -85,11 +98,14 @@ def login():
     """
     data = request.get_json()
 
-    if not data or not data.get("username") or not data.get("password"):
-        return jsonify({"success": False, "error": "缺少用户名或密码"}), 400
+    # 使用Schema验证数据
+    try:
+        validated_data = user_login_schema.load(data)
+    except ValidationError as err:
+        return jsonify({"success": False, "error": "数据验证失败", "details": err.messages}), 400
 
-    username_or_email = data["username"]
-    password = data["password"]
+    username_or_email = validated_data["username"]
+    password = validated_data["password"]
 
     # 查找用户（支持用户名或邮箱登录）
     user = User.query.filter(
@@ -191,12 +207,18 @@ def update_current_user():
 
     data = request.get_json()
 
-    # 更新允许修改的字段
-    if "full_name" in data:
-        user.full_name = data["full_name"]
+    # 使用Schema验证数据
+    try:
+        validated_data = user_update_schema.load(data)
+    except ValidationError as err:
+        return jsonify({"success": False, "error": "数据验证失败", "details": err.messages}), 400
 
-    if "email" in data:
-        new_email = data["email"]
+    # 更新允许修改的字段
+    if "full_name" in validated_data:
+        user.full_name = validated_data["full_name"]
+
+    if "email" in validated_data:
+        new_email = validated_data["email"]
         # 检查新邮箱是否已被其他用户使用
         existing = User.query.filter(User.email == new_email, User.id != user.id).first()
         if existing:
