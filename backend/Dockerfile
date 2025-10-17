@@ -11,9 +11,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_INDEX_URL=https://mirrors.cloud.tencent.com/pypi/simple \
     PIP_TRUSTED_HOST=mirrors.cloud.tencent.com
 
-# 更换apt源为腾讯云镜像（加速）
-RUN sed -i 's/deb.debian.org/mirrors.cloud.tencent.com/g' /etc/apt/sources.list && \
-    sed -i 's/security.debian.org/mirrors.cloud.tencent.com/g' /etc/apt/sources.list
+# 保持系统默认 apt 源，避免某些基础镜像缺失 sources.list 导致报错
 
 # 安装系统依赖
 RUN apt-get update && apt-get install -y \
