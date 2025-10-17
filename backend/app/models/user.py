@@ -16,15 +16,17 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False, index=True)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
-    
+
     # 用户信息
     full_name = db.Column(db.String(120))
     role = db.Column(db.String(20), default="user")  # admin, user, viewer
     is_active = db.Column(db.Boolean, default=True)
-    
+
     # 时间戳
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
     last_login = db.Column(db.DateTime)
 
     def __repr__(self):
@@ -32,7 +34,7 @@ class User(db.Model):
 
     def set_password(self, password):
         """设置密码（哈希加密）"""
-        self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
+        self.password_hash = generate_password_hash(password, method="pbkdf2:sha256")
 
     def check_password(self, password):
         """验证密码"""
@@ -50,23 +52,25 @@ class User(db.Model):
         }
 
         if include_timestamps:
-            data.update({
-                "created_at": self.created_at.isoformat() if self.created_at else None,
-                "updated_at": self.updated_at.isoformat() if self.updated_at else None,
-                "last_login": self.last_login.isoformat() if self.last_login else None,
-            })
+            data.update(
+                {
+                    "created_at": (
+                        self.created_at.isoformat() if self.created_at else None
+                    ),
+                    "updated_at": (
+                        self.updated_at.isoformat() if self.updated_at else None
+                    ),
+                    "last_login": (
+                        self.last_login.isoformat() if self.last_login else None
+                    ),
+                }
+            )
 
         return data
 
     @staticmethod
     def create_user(username, email, password, full_name=None, role="user"):
         """创建新用户"""
-        user = User(
-            username=username,
-            email=email,
-            full_name=full_name,
-            role=role
-        )
+        user = User(username=username, email=email, full_name=full_name, role=role)
         user.set_password(password)
         return user
-

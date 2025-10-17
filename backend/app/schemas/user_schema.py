@@ -7,6 +7,7 @@ from marshmallow import Schema, fields, validate, validates, ValidationError
 
 class UserSchema(Schema):
     """用户信息Schema"""
+
     id = fields.Int(dump_only=True)
     username = fields.Str(required=True, validate=validate.Length(min=3, max=80))
     email = fields.Email(required=True)
@@ -20,24 +21,22 @@ class UserSchema(Schema):
 
 class UserRegistrationSchema(Schema):
     """用户注册Schema"""
+
     username = fields.Str(
         required=True,
         validate=validate.Length(min=3, max=80),
-        error_messages={"required": "用户名不能为空"}
+        error_messages={"required": "用户名不能为空"},
     )
     email = fields.Email(
         required=True,
-        error_messages={"required": "邮箱不能为空", "invalid": "邮箱格式不正确"}
+        error_messages={"required": "邮箱不能为空", "invalid": "邮箱格式不正确"},
     )
     password = fields.Str(
         required=True,
         validate=validate.Length(min=6, max=128),
-        error_messages={"required": "密码不能为空"}
+        error_messages={"required": "密码不能为空"},
     )
-    full_name = fields.Str(
-        allow_none=True,
-        validate=validate.Length(max=120)
-    )
+    full_name = fields.Str(allow_none=True, validate=validate.Length(max=120))
 
     @validates("password")
     def validate_password(self, value):
@@ -50,31 +49,28 @@ class UserRegistrationSchema(Schema):
 
 class UserLoginSchema(Schema):
     """用户登录Schema"""
+
     username = fields.Str(
-        required=True,
-        error_messages={"required": "用户名/邮箱不能为空"}
+        required=True, error_messages={"required": "用户名/邮箱不能为空"}
     )
-    password = fields.Str(
-        required=True,
-        error_messages={"required": "密码不能为空"}
-    )
+    password = fields.Str(required=True, error_messages={"required": "密码不能为空"})
 
 
 class UserUpdateSchema(Schema):
     """用户信息更新Schema"""
+
     email = fields.Email(error_messages={"invalid": "邮箱格式不正确"})
     full_name = fields.Str(validate=validate.Length(max=120))
 
 
 class ChangePasswordSchema(Schema):
     """修改密码Schema"""
+
     old_password = fields.Str(
-        required=True,
-        error_messages={"required": "旧密码不能为空"}
+        required=True, error_messages={"required": "旧密码不能为空"}
     )
     new_password = fields.Str(
         required=True,
         validate=validate.Length(min=6, max=128),
-        error_messages={"required": "新密码不能为空"}
+        error_messages={"required": "新密码不能为空"},
     )
-

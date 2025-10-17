@@ -32,7 +32,7 @@ user_update_schema = UserUpdateSchema()
 def register():
     """
     用户注册
-    
+
     请求体:
         {
             "username": "用户名",
@@ -47,7 +47,12 @@ def register():
     try:
         validated_data = user_registration_schema.load(data)
     except ValidationError as err:
-        return jsonify({"success": False, "error": "数据验证失败", "details": err.messages}), 400
+        return (
+            jsonify(
+                {"success": False, "error": "数据验证失败", "details": err.messages}
+            ),
+            400,
+        )
 
     username = validated_data["username"]
     email = validated_data["email"]
@@ -64,21 +69,23 @@ def register():
 
     # 创建新用户
     user = User.create_user(
-        username=username,
-        email=email,
-        password=password,
-        full_name=full_name
+        username=username, email=email, password=password, full_name=full_name
     )
 
     try:
         db.session.add(user)
         db.session.commit()
 
-        return jsonify({
-            "success": True,
-            "message": "注册成功",
-            "data": user.to_dict(include_timestamps=False)
-        }), 201
+        return (
+            jsonify(
+                {
+                    "success": True,
+                    "message": "注册成功",
+                    "data": user.to_dict(include_timestamps=False),
+                }
+            ),
+            201,
+        )
 
     except Exception as e:
         db.session.rollback()
@@ -89,7 +96,7 @@ def register():
 def login():
     """
     用户登录
-    
+
     请求体:
         {
             "username": "用户名或邮箱",
@@ -102,7 +109,12 @@ def login():
     try:
         validated_data = user_login_schema.load(data)
     except ValidationError as err:
-        return jsonify({"success": False, "error": "数据验证失败", "details": err.messages}), 400
+        return (
+            jsonify(
+                {"success": False, "error": "数据验证失败", "details": err.messages}
+            ),
+            400,
+        )
 
     username_or_email = validated_data["username"]
     password = validated_data["password"]
@@ -127,19 +139,21 @@ def login():
     # 生成 JWT Token
     access_token = create_access_token(
         identity=user.id,
-        additional_claims={"role": user.role, "username": user.username}
+        additional_claims={"role": user.role, "username": user.username},
     )
     refresh_token = create_refresh_token(identity=user.id)
 
-    return jsonify({
-        "success": True,
-        "message": "登录成功",
-        "data": {
-            "user": user.to_dict(include_timestamps=False),
-            "access_token": access_token,
-            "refresh_token": refresh_token
+    return jsonify(
+        {
+            "success": True,
+            "message": "登录成功",
+            "data": {
+                "user": user.to_dict(include_timestamps=False),
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+            },
         }
-    })
+    )
 
 
 @auth_bp.route("/refresh", methods=["POST"])
@@ -147,7 +161,7 @@ def login():
 def refresh():
     """
     刷新 Access Token
-    
+
     需要在 Authorization header 中提供 Refresh Token
     """
     identity = get_jwt_identity()
@@ -158,13 +172,10 @@ def refresh():
 
     access_token = create_access_token(
         identity=user.id,
-        additional_claims={"role": user.role, "username": user.username}
+        additional_claims={"role": user.role, "username": user.username},
     )
 
-    return jsonify({
-        "success": True,
-        "data": {"access_token": access_token}
-    })
+    return jsonify({"success": True, "data": {"access_token": access_token}})
 
 
 @auth_bp.route("/me", methods=["GET"])
@@ -172,7 +183,7 @@ def refresh():
 def get_current_user():
     """
     获取当前登录用户信息
-    
+
     需要在 Authorization header 中提供 Access Token
     """
     identity = get_jwt_identity()
@@ -181,10 +192,7 @@ def get_current_user():
     if not user:
         return jsonify({"success": False, "error": "用户不存在"}), 404
 
-    return jsonify({
-        "success": True,
-        "data": user.to_dict()
-    })
+    return jsonify({"success": True, "data": user.to_dict()})
 
 
 @auth_bp.route("/me", methods=["PUT"])
@@ -192,7 +200,7 @@ def get_current_user():
 def update_current_user():
     """
     更新当前用户信息
-    
+
     请求体:
         {
             "full_name": "新的全名",
@@ -211,7 +219,12 @@ def update_current_user():
     try:
         validated_data = user_update_schema.load(data)
     except ValidationError as err:
-        return jsonify({"success": False, "error": "数据验证失败", "details": err.messages}), 400
+        return (
+            jsonify(
+                {"success": False, "error": "数据验证失败", "details": err.messages}
+            ),
+            400,
+        )
 
     # 更新允许修改的字段
     if "full_name" in validated_data:
@@ -220,18 +233,16 @@ def update_current_user():
     if "email" in validated_data:
         new_email = validated_data["email"]
         # 检查新邮箱是否已被其他用户使用
-        existing = User.query.filter(User.email == new_email, User.id != user.id).first()
+        existing = User.query.filter(
+            User.email == new_email, User.id != user.id
+        ).first()
         if existing:
             return jsonify({"success": False, "error": "邮箱已被其他用户使用"}), 400
         user.email = new_email
 
     try:
         db.session.commit()
-        return jsonify({
-            "success": True,
-            "message": "更新成功",
-            "data": user.to_dict()
-        })
+        return jsonify({"success": True, "message": "更新成功", "data": user.to_dict()})
     except Exception as e:
         db.session.rollback()
         return jsonify({"success": False, "error": f"更新失败: {str(e)}"}), 500
@@ -242,7 +253,7 @@ def update_current_user():
 def change_password():
     """
     修改密码
-    
+
     请求体:
         {
             "old_password": "旧密码",
@@ -287,8 +298,4 @@ def list_users():
         return jsonify({"success": False, "error": "权限不足"}), 403
 
     users = User.query.all()
-    return jsonify({
-        "success": True,
-        "data": [user.to_dict() for user in users]
-    })
-
+    return jsonify({"success": True, "data": [user.to_dict() for user in users]})
