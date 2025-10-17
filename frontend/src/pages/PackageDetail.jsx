@@ -227,72 +227,94 @@ const PackageDetail = () => {
         ) : (
           <div className="space-y-6">
             {(() => {
-              // 按 tag_name 分组
-              const groupedTags = {};
+              // 按标签分类分组（基于标签代码前缀）
+              const groupedTags = {
+                '成功类': [],
+                '可跟进类': [],
+                '无效类': [],
+                '其他': []
+              };
+              
               tagSummaries.forEach((summary) => {
-                if (!groupedTags[summary.tag_name]) {
-                  groupedTags[summary.tag_name] = [];
+                const tagCode = summary.tag_name; // AS1, AF2 等
+                
+                if (tagCode.startsWith('AS')) {
+                  groupedTags['成功类'].push(summary);
+                } else if (tagCode.startsWith('AF')) {
+                  groupedTags['可跟进类'].push(summary);
+                } else if (tagCode.startsWith('AN') || tagCode === 'AOT') {
+                  groupedTags['无效类'].push(summary);
+                } else {
+                  groupedTags['其他'].push(summary);
                 }
-                groupedTags[summary.tag_name].push(summary);
               });
 
-              return Object.entries(groupedTags).map(([tagName, tags]) => (
-                <div key={tagName} className="border rounded-lg p-4">
-                  <h4 className="font-semibold text-lg mb-4 text-gray-700">{tagName}</h4>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {tags.map((tag, index) => {
-                      const percentage = (tag.percentage * 100).toFixed(1);
-                      
-                      // 根据标签值选择颜色
-                      let bgColor = 'bg-gray-100';
-                      let textColor = 'text-gray-700';
-                      let barColor = 'bg-gray-400';
-                      
-                      if (tag.tag_value === 'high' || tag.tag_value === '科技' || tag.tag_value === '金融') {
-                        bgColor = 'bg-red-50';
-                        textColor = 'text-red-700';
-                        barColor = 'bg-red-500';
-                      } else if (tag.tag_value === 'medium' || tag.tag_value === '教育' || tag.tag_value === '医疗') {
-                        bgColor = 'bg-yellow-50';
-                        textColor = 'text-yellow-700';
-                        barColor = 'bg-yellow-500';
-                      } else if (tag.tag_value === 'low' || tag.tag_value === '制造' || tag.tag_value === '零售') {
-                        bgColor = 'bg-green-50';
-                        textColor = 'text-green-700';
-                        barColor = 'bg-green-500';
-                      }
-                      
-                      return (
-                        <div key={index} className={`${bgColor} rounded-lg p-3`}>
-                          <div className="flex justify-between items-center mb-2">
-                            <span className={`font-medium ${textColor}`}>
-                              {tag.tag_value}
-                            </span>
-                            <span className="text-sm font-mono text-gray-600">
-                              {formatNumber(tag.tag_count)}
-                            </span>
+              return Object.entries(groupedTags).map(([categoryName, tags]) => {
+                if (tags.length === 0) return null;
+                
+                return (
+                  <div key={categoryName} className="border rounded-lg p-4">
+                    <h4 className="font-semibold text-lg mb-4 text-gray-700">{categoryName}</h4>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                      {tags.map((tag, index) => {
+                        const percentage = (tag.percentage * 100).toFixed(1);
+                        
+                        // 根据标签分类选择颜色
+                        let bgColor = 'bg-gray-100';
+                        let textColor = 'text-gray-700';
+                        let barColor = 'bg-gray-400';
+                        
+                        if (categoryName === '成功类') {
+                          bgColor = 'bg-green-50';
+                          textColor = 'text-green-700';
+                          barColor = 'bg-green-500';
+                        } else if (categoryName === '可跟进类') {
+                          bgColor = 'bg-blue-50';
+                          textColor = 'text-blue-700';
+                          barColor = 'bg-blue-500';
+                        } else if (categoryName === '无效类') {
+                          bgColor = 'bg-red-50';
+                          textColor = 'text-red-700';
+                          barColor = 'bg-red-500';
+                        }
+                        
+                        return (
+                          <div key={index} className={`${bgColor} rounded-lg p-3`}>
+                            <div className="flex justify-between items-start mb-2">
+                              <div className="flex-1">
+                                <span className={`text-xs font-bold ${textColor}`}>
+                                  {tag.tag_name}
+                                </span>
+                                <span className={`block text-sm font-medium ${textColor} mt-1`}>
+                                  {tag.tag_value}
+                                </span>
+                              </div>
+                              <span className="text-sm font-mono font-semibold text-gray-700 ml-2">
+                                {formatNumber(tag.tag_count)}
+                              </span>
+                            </div>
+                            
+                            {/* 进度条 */}
+                            <div className="relative w-full h-2 bg-white rounded-full overflow-hidden">
+                              <div
+                                className={`h-full ${barColor} rounded-full transition-all`}
+                                style={{ width: `${percentage}%` }}
+                              ></div>
+                            </div>
+                            
+                            <div className="mt-1 text-right">
+                              <span className="text-xs font-semibold text-gray-600">
+                                {percentage}%
+                              </span>
+                            </div>
                           </div>
-                          
-                          {/* 进度条 */}
-                          <div className="relative w-full h-2 bg-white rounded-full overflow-hidden">
-                            <div
-                              className={`h-full ${barColor} rounded-full transition-all`}
-                              style={{ width: `${percentage}%` }}
-                            ></div>
-                          </div>
-                          
-                          <div className="mt-1 text-right">
-                            <span className="text-xs font-semibold text-gray-600">
-                              {percentage}%
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              ));
+                );
+              }).filter(Boolean);
             })()}
           </div>
         )}

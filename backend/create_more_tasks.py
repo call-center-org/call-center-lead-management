@@ -159,35 +159,57 @@ def create_more_tasks():
                     db.session.add(call)
                     db.session.flush()
 
-                    # 为接通的电话添加标签
+                    # 为接通的电话添加标签（使用真实的16个标签）
                     if is_connected:
-                        # 意向等级
-                        interest_levels = ["high", "medium", "low"]
-                        interest_weights = [20, 50, 30]
-                        interest = random.choices(
-                            interest_levels, weights=interest_weights
+                        # 真实标签定义（基于PRD文档）
+                        # 成功类（2个）：AS1, AS2
+                        # 可跟进类（8个）：AF2, AF3, AF4, AF5, AF11, AF12, AF13, AF14
+                        # 无效类（5个）：AN1, AN2, AN3, AN4, AOT
+                        # 未处理类（1个）：AG
+                        
+                        # 按真实业务概率分配标签
+                        tag_distribution = [
+                            ("AS1", "成功单9元", 5),          # 5% 成功单9元
+                            ("AS2", "成功单1元", 8),          # 8% 成功单1元
+                            ("AF11", "高中家长", 12),         # 12% 高中家长
+                            ("AF12", "初中家长", 10),         # 10% 初中家长
+                            ("AF13", "小学家长", 8),          # 8% 小学家长
+                            ("AF14", "学生本人", 5),          # 5% 学生本人
+                            ("AF3", "加微信成功挂断", 10),    # 10% 加微信
+                            ("AF4", "付费环节挂断", 6),       # 6% 付费环节
+                            ("AF2", "在忙/晚点再说", 15),     # 15% 在忙
+                            ("AF5", "没说话，直接挂断", 8),   # 8% 没说话
+                            ("AN2", "明确不需要/非目标人", 8), # 8% 明拒
+                            ("AN4", "已报名/已购买", 3),      # 3% 已购买
+                            ("AN3", "语音助手", 1),           # 1% 语音助手
+                            ("AOT", "其他", 1),               # 1% 其他
+                        ]
+                        
+                        # 选择标签
+                        tag_codes = [t[0] for t in tag_distribution]
+                        tag_names = [t[1] for t in tag_distribution]
+                        tag_weights = [t[2] for t in tag_distribution]
+                        
+                        selected_index = random.choices(
+                            range(len(tag_codes)),
+                            weights=tag_weights
                         )[0]
-
-                        if interest == "high":
+                        
+                        tag_code = tag_codes[selected_index]
+                        tag_name = tag_names[selected_index]
+                        
+                        # 成功单计数
+                        if tag_code in ["AS1", "AS2"]:
                             interested_count += 1
-
-                        tag1 = CallTag(
+                        
+                        # 保存标签
+                        tag = CallTag(
                             call_id=call.id,
-                            tag_name="意向等级",
-                            tag_value=interest,
-                            tag_type="interest",
+                            tag_name=tag_code,  # 使用标签代码作为tag_name
+                            tag_value=tag_name,  # 使用标签含义作为tag_value
+                            tag_type="result",
                         )
-                        db.session.add(tag1)
-
-                        # 行业标签
-                        industries = ["科技", "教育", "金融", "医疗", "制造", "零售"]
-                        tag2 = CallTag(
-                            call_id=call.id,
-                            tag_name="客户行业",
-                            tag_value=random.choice(industries),
-                            tag_type="industry",
-                        )
-                        db.session.add(tag2)
+                        db.session.add(tag)
 
                 # 更新任务统计
                 task.total_calls = num_calls

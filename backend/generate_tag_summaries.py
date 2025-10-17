@@ -53,25 +53,18 @@ def generate_tag_summaries():
                 .all()
             )
 
-            # 计算总标签数（按 tag_name 分组）
-            tag_totals = {}
-            for stat in tag_stats:
-                tag_name = stat.tag_name
-                if tag_name not in tag_totals:
-                    tag_totals[tag_name] = 0
-                tag_totals[tag_name] += stat.tag_count
+            # 计算所有标签的总数（用于计算占比）
+            total_tags = sum(stat.tag_count for stat in tag_stats)
 
             # 创建标签汇总记录
             summaries_created = 0
             for stat in tag_stats:
-                tag_name = stat.tag_name
-                tag_value = stat.tag_value
+                tag_name = stat.tag_name  # 标签代码（AS1, AF2等）
+                tag_value = stat.tag_value  # 标签含义
                 tag_count = stat.tag_count
 
-                # 计算占比
-                percentage = (
-                    tag_count / tag_totals[tag_name] if tag_totals[tag_name] > 0 else 0
-                )
+                # 计算占比（相对于所有标签）
+                percentage = tag_count / total_tags if total_tags > 0 else 0
 
                 summary = PackageTagSummary(
                     package_id=package.id,
@@ -84,7 +77,9 @@ def generate_tag_summaries():
                 summaries_created += 1
 
             db.session.commit()
-            print(f"  ✅ 创建 {summaries_created} 条标签汇总记录\n")
+            print(
+                f"  ✅ 创建 {summaries_created} 条标签汇总记录 (总标签数: {total_tags})\n"
+            )
 
         print("✅ 所有标签汇总生成完成！")
 
@@ -107,4 +102,3 @@ def generate_tag_summaries():
 
 if __name__ == "__main__":
     generate_tag_summaries()
-
