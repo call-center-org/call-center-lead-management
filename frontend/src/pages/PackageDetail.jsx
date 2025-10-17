@@ -310,9 +310,11 @@ const PackageDetail = () => {
                         return (
                           <div key={index} className="flex items-center gap-1.5">
                             <div className={`w-3 h-3 rounded ${barColor}`}></div>
-                            <span className="text-xs text-gray-600">
-                              {tag.tag_name} 
-                              <span className="text-gray-400 ml-1">
+                            <span className="text-xs text-gray-700">
+                              {tag.tag_name}
+                              <span className="text-gray-500 mx-1">·</span>
+                              {tag.tag_value}
+                              <span className="text-gray-400 ml-1.5">
                                 {formatNumber(tag.tag_count)} ({percentage.toFixed(1)}%)
                               </span>
                             </span>
