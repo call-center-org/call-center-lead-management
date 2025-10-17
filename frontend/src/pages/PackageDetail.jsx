@@ -109,7 +109,7 @@ const PackageDetail = () => {
         )}
       </div>
 
-      {/* 外呼任务列表 */}
+      {/* 外呼任务列表 - 表格形式 */}
       <div className="bg-white rounded-lg shadow-card p-card">
         <h3 className="text-xl font-semibold mb-4">外呼任务</h3>
 
@@ -118,77 +118,102 @@ const PackageDetail = () => {
             <p>暂无外呼任务</p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {dialTasks.map((task) => (
-              <div
-                key={task.id}
-                className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <h4 className="font-semibold text-lg">{task.task_name}</h4>
-                    {task.description && (
-                      <p className="text-sm text-gray-600 mt-1">{task.description}</p>
-                    )}
-                  </div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      task.status === "completed"
-                        ? "bg-success text-white"
-                        : task.status === "in_progress"
-                        ? "bg-warning text-white"
-                        : "bg-gray-300 text-gray-700"
-                    }`}
-                  >
-                    {task.status === "completed"
-                      ? "已完成"
-                      : task.status === "in_progress"
-                      ? "进行中"
-                      : "待开始"}
-                  </span>
-                </div>
-
-                {/* 任务时间 */}
-                <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
-                  <div>
-                    <span className="text-gray-600">开始时间: </span>
-                    <span className="font-medium">
-                      {task.start_time ? new Date(task.start_time).toLocaleString('zh-CN') : "-"}
-                    </span>
-                  </div>
-                  {task.end_time && (
-                    <div>
-                      <span className="text-gray-600">结束时间: </span>
-                      <span className="font-medium">
-                        {new Date(task.end_time).toLocaleString('zh-CN')}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* 任务统计 */}
-                <div className="grid grid-cols-3 gap-4 pt-3 border-t">
-                  <div className="text-center">
-                    <p className="text-sm text-gray-600">总呼叫</p>
-                    <p className="text-lg font-bold text-primary">
-                      {formatNumber(task.total_calls || 0)}
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm text-gray-600">接通数</p>
-                    <p className="text-lg font-bold text-success">
-                      {formatNumber(task.connected_calls || 0)}
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm text-gray-600">意向数</p>
-                    <p className="text-lg font-bold text-warning">
-                      {formatNumber(task.interested_calls || 0)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-600">任务日期</th>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-600">星期</th>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-600">任务ID</th>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-600">任务名</th>
+                  <th className="px-4 py-3 text-right font-semibold text-gray-600">外呼数</th>
+                  <th className="px-4 py-3 text-right font-semibold text-gray-600">剩余数</th>
+                  <th className="px-4 py-3 text-right font-semibold text-gray-600">接通数</th>
+                  <th className="px-4 py-3 text-right font-semibold text-gray-600">接通率</th>
+                  <th className="px-4 py-3 text-right font-semibold text-gray-600">成功数</th>
+                  <th className="px-4 py-3 text-right font-semibold text-gray-600">接通成功率</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(() => {
+                  // 按任务日期排序（最新的在上）
+                  const sortedTasks = [...dialTasks].sort((a, b) => 
+                    new Date(b.start_time) - new Date(a.start_time)
+                  );
+                  
+                  // 计算累计外呼数（用于计算剩余数）
+                  let cumulativeCalls = 0;
+                  
+                  return sortedTasks.map((task, index) => {
+                    cumulativeCalls += task.total_calls || 0;
+                    
+                    const taskDate = task.start_time ? new Date(task.start_time) : null;
+                    const dateStr = taskDate ? taskDate.toLocaleDateString('zh-CN') : '-';
+                    const weekDay = taskDate ? ['日', '一', '二', '三', '四', '五', '六'][taskDate.getDay()] : '-';
+                    
+                    // 剩余数 = 总线索数 - 累计外呼数
+                    const remaining = packageData ? packageData.total_leads - cumulativeCalls : 0;
+                    
+                    // 接通率 = 接通数 / 外呼数
+                    const contactRate = task.total_calls > 0 
+                      ? ((task.connected_calls || 0) / task.total_calls * 100).toFixed(2) 
+                      : '0.00';
+                    
+                    // 接通成功率 = 成功数 / 接通数
+                    const successRate = (task.connected_calls || 0) > 0
+                      ? ((task.interested_calls || 0) / task.connected_calls * 100).toFixed(2)
+                      : '0.00';
+                    
+                    return (
+                      <tr key={task.id} className="border-t hover:bg-gray-50">
+                        <td className="px-4 py-3">{dateStr}</td>
+                        <td className="px-4 py-3">周{weekDay}</td>
+                        <td className="px-4 py-3 text-gray-600">{task.id}</td>
+                        <td className="px-4 py-3 font-medium">{task.task_name}</td>
+                        <td className="px-4 py-3 text-right font-mono">{formatNumber(task.total_calls || 0)}</td>
+                        <td className="px-4 py-3 text-right font-mono text-blue-600">{formatNumber(remaining)}</td>
+                        <td className="px-4 py-3 text-right font-mono text-success">{formatNumber(task.connected_calls || 0)}</td>
+                        <td className="px-4 py-3 text-right font-mono">{contactRate}%</td>
+                        <td className="px-4 py-3 text-right font-mono text-warning">{formatNumber(task.interested_calls || 0)}</td>
+                        <td className="px-4 py-3 text-right font-mono">{successRate}%</td>
+                      </tr>
+                    );
+                  });
+                })()}
+              </tbody>
+              {/* 表格汇总行 */}
+              <tfoot className="bg-gray-50 border-t-2">
+                <tr>
+                  <td colSpan="4" className="px-4 py-3 text-right font-semibold">汇总：</td>
+                  <td className="px-4 py-3 text-right font-bold font-mono">
+                    {formatNumber(dialTasks.reduce((sum, t) => sum + (t.total_calls || 0), 0))}
+                  </td>
+                  <td className="px-4 py-3 text-right font-bold font-mono text-blue-600">
+                    {packageData ? formatNumber(packageData.total_leads - dialTasks.reduce((sum, t) => sum + (t.total_calls || 0), 0)) : '-'}
+                  </td>
+                  <td className="px-4 py-3 text-right font-bold font-mono text-success">
+                    {formatNumber(dialTasks.reduce((sum, t) => sum + (t.connected_calls || 0), 0))}
+                  </td>
+                  <td className="px-4 py-3 text-right font-bold font-mono">
+                    {(() => {
+                      const totalCalls = dialTasks.reduce((sum, t) => sum + (t.total_calls || 0), 0);
+                      const totalConnected = dialTasks.reduce((sum, t) => sum + (t.connected_calls || 0), 0);
+                      return totalCalls > 0 ? ((totalConnected / totalCalls * 100).toFixed(2)) : '0.00';
+                    })()}%
+                  </td>
+                  <td className="px-4 py-3 text-right font-bold font-mono text-warning">
+                    {formatNumber(dialTasks.reduce((sum, t) => sum + (t.interested_calls || 0), 0))}
+                  </td>
+                  <td className="px-4 py-3 text-right font-bold font-mono">
+                    {(() => {
+                      const totalConnected = dialTasks.reduce((sum, t) => sum + (t.connected_calls || 0), 0);
+                      const totalInterested = dialTasks.reduce((sum, t) => sum + (t.interested_calls || 0), 0);
+                      return totalConnected > 0 ? ((totalInterested / totalConnected * 100).toFixed(2)) : '0.00';
+                    })()}%
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
           </div>
         )}
       </div>
