@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import apiClient from "../utils/apiClient";
+import { formatNumber, formatCurrency } from "../utils/formatNumber";
 
 const PackageRegister = () => {
   const navigate = useNavigate();
@@ -321,15 +322,18 @@ const PackageRegister = () => {
           {formData.totalLeads && formData.costPerLead && (
             <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-gray-700">
-                  总成本预估
-                </span>
+                <div>
+                  <span className="text-sm font-medium text-gray-700">
+                    总成本预估
+                  </span>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {formatNumber(formData.totalLeads)} 条 × ¥{formData.costPerLead} = 
+                  </p>
+                </div>
                 <span className="text-2xl font-bold text-primary">
-                  ¥
-                  {(
-                    parseFloat(formData.totalLeads) *
-                    parseFloat(formData.costPerLead)
-                  ).toFixed(2)}
+                  {formatCurrency(
+                    parseFloat(formData.totalLeads) * parseFloat(formData.costPerLead)
+                  )}
                 </span>
               </div>
             </div>

@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import apiClient from "../utils/apiClient";
+import { formatNumber, formatPercent } from "../utils/formatNumber";
+import toast from "react-hot-toast";
 
 const Dashboard = () => {
   const [packages, setPackages] = useState([]);
@@ -9,13 +12,47 @@ const Dashboard = () => {
     avgContactRate: 0,
     avgInterestRate: 0,
   });
+  const [loading, setLoading] = useState(true);
 
-  // 后续将从 API 获取数据
+  // 获取数据
   useEffect(() => {
-    // TODO: 从 API 获取数据包列表和指标
-    // fetchPackages();
-    // fetchMetrics();
+    fetchDashboardData();
   }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      
+      // 获取仪表盘数据
+      const response = await apiClient.get("/metrics/dashboard");
+      
+      if (response.data.success) {
+        const { summary, recent_packages } = response.data.data;
+        
+        setMetrics({
+          totalPackages: summary.total_packages || 0,
+          totalLeads: summary.total_leads || 0,
+          avgContactRate: summary.avg_contact_rate || 0,
+          avgInterestRate: summary.avg_interest_rate || 0,
+        });
+        
+        setPackages(recent_packages || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch dashboard data:", error);
+      toast.error("加载数据失败");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-gray-500">加载中...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -24,25 +61,25 @@ const Dashboard = () => {
         <div className="bg-white rounded-lg shadow-card p-card">
           <h3 className="text-sm text-gray-600 mb-2">数据包总数</h3>
           <p className="text-3xl font-bold text-primary">
-            {metrics.totalPackages}
+            {formatNumber(metrics.totalPackages)}
           </p>
         </div>
         <div className="bg-white rounded-lg shadow-card p-card">
           <h3 className="text-sm text-gray-600 mb-2">线索总量</h3>
           <p className="text-3xl font-bold text-secondary">
-            {metrics.totalLeads}
+            {formatNumber(metrics.totalLeads)}
           </p>
         </div>
         <div className="bg-white rounded-lg shadow-card p-card">
           <h3 className="text-sm text-gray-600 mb-2">平均接通率</h3>
           <p className="text-3xl font-bold text-success">
-            {metrics.avgContactRate}%
+            {formatPercent(metrics.avgContactRate)}
           </p>
         </div>
         <div className="bg-white rounded-lg shadow-card p-card">
           <h3 className="text-sm text-gray-600 mb-2">平均意向率</h3>
           <p className="text-3xl font-bold text-warning">
-            {metrics.avgInterestRate}%
+            {formatPercent(metrics.avgInterestRate)}
           </p>
         </div>
       </div>
@@ -73,15 +110,21 @@ const Dashboard = () => {
                     数据包名称
                   </th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">
-                    来源
+                    包属性
                   </th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">
-                    行业
+                    对应职场
                   </th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">
-                    线索数量
+                    年级
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">
+                  <th className="px-4 py-3 text-right text-sm font-semibold text-gray-600">
+                    总数
+                  </th>
+                  <th className="px-4 py-3 text-right text-sm font-semibold text-gray-600">
+                    有效数
+                  </th>
+                  <th className="px-4 py-3 text-right text-sm font-semibold text-gray-600">
                     接通率
                   </th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">
@@ -94,9 +137,17 @@ const Dashboard = () => {
                   <tr key={pkg.id} className="border-t hover:bg-gray-50">
                     <td className="px-4 py-3">{pkg.name}</td>
                     <td className="px-4 py-3">{pkg.source}</td>
+                    <td className="px-4 py-3">{pkg.region}</td>
                     <td className="px-4 py-3">{pkg.industry}</td>
-                    <td className="px-4 py-3">{pkg.totalLeads}</td>
-                    <td className="px-4 py-3">{pkg.contactRate}%</td>
+                    <td className="px-4 py-3 text-right font-mono">
+                      {formatNumber(pkg.total_leads)}
+                    </td>
+                    <td className="px-4 py-3 text-right font-mono">
+                      {formatNumber(pkg.valid_leads)}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      {formatPercent(pkg.contact_rate)}
+                    </td>
                     <td className="px-4 py-3">
                       <Link
                         to={`/package/${pkg.id}`}
