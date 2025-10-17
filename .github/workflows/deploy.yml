@@ -27,7 +27,14 @@ jobs:
           npm install -g @cloudbase/cli@latest
           tcb -v
 
-      - name: 部署到 CloudBase
+      - name: 构建前端
+        run: |
+          cd frontend
+          npm install
+          npm run build
+          ls -la dist/
+
+      - name: 部署前端到静态网站托管
         env:
           CLOUDBASE_SECRET_ID: ${{ secrets.CLOUDBASE_SECRET_ID }}
           CLOUDBASE_SECRET_KEY: ${{ secrets.CLOUDBASE_SECRET_KEY }}
@@ -35,22 +42,22 @@ jobs:
           TCB_SECRET_KEY: ${{ secrets.CLOUDBASE_SECRET_KEY }}
           CLOUDBASE_ENV_ID: cloud1-6gt5ulxm10210d0f
         run: |
-          # CloudBase CLI 通过环境变量自动认证
-          echo "✅ 已配置 CloudBase 认证环境变量"
-          echo "   - TCB_SECRET_ID: ${TCB_SECRET_ID:0:10}..."
-          echo "   - 环境ID: $CLOUDBASE_ENV_ID"
-          
-          # 确认环境
-          echo "检查可用环境..."
-          tcb env:list 2>&1 || echo "⚠️ 环境列表获取失败，但将继续部署"
-          
-          # 部署前后端
-          echo ""
-          echo "🚀 开始部署项目到 CloudBase..."
+          echo "🚀 部署前端静态文件..."
+          cd frontend
+          tcb hosting deploy dist/ /lead-management --envId $CLOUDBASE_ENV_ID
+          echo "✅ 前端部署完成！"
+
+      - name: 部署后端到云托管
+        env:
+          CLOUDBASE_SECRET_ID: ${{ secrets.CLOUDBASE_SECRET_ID }}
+          CLOUDBASE_SECRET_KEY: ${{ secrets.CLOUDBASE_SECRET_KEY }}
+          TCB_SECRET_ID: ${{ secrets.CLOUDBASE_SECRET_ID }}
+          TCB_SECRET_KEY: ${{ secrets.CLOUDBASE_SECRET_KEY }}
+          CLOUDBASE_ENV_ID: cloud1-6gt5ulxm10210d0f
+        run: |
+          echo "🚀 部署后端容器服务..."
           echo "Y" | tcb framework deploy --envId $CLOUDBASE_ENV_ID --verbose
-          
-          echo ""
-          echo "✅ 部署完成！"
+          echo "✅ 后端部署完成！"
 
       - name: 部署结果通知
         if: always()
