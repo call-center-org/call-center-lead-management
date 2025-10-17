@@ -58,6 +58,10 @@ def create_app(config_name=None):
     # 注册 CLI 命令
     register_commands(app)
 
+    # 自动创建数据库表（生产环境）
+    with app.app_context():
+        db.create_all()
+
     return app
 
 
