@@ -243,9 +243,11 @@ def import_data():
                     total_leads=data["total"],
                     valid_leads=data["valid"],
                     cost_per_lead=1.0,  # 默认单条成本1元
+                    contact_rate=0.0,  # 历史数据默认接通率为0（还未拨打）
+                    interest_rate=0.0,  # 历史数据默认意向率为0
                 )
 
-                # 计算指标
+                # 计算成本等其他指标
                 package.calculate_metrics()
 
                 # 保存
