@@ -10,41 +10,56 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     name: 部署前后端到 CloudBase
-    
+
     steps:
       - name: 检出代码
         uses: actions/checkout@v3
-      
+
       - name: 设置 Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
-      
+
       - name: 安装 CloudBase CLI
         run: |
           npm install -g @cloudbase/cli@latest
           tcb -v
-      
+
       - name: 部署到 CloudBase
         env:
           CLOUDBASE_SECRET_ID: ${{ secrets.CLOUDBASE_SECRET_ID }}
           CLOUDBASE_SECRET_KEY: ${{ secrets.CLOUDBASE_SECRET_KEY }}
+          CLOUDBASE_ENV_ID: cloud1-6gt5ulxm10210d0f
         run: |
-          # 使用 SecretId 和 SecretKey 登录
-          echo "开始登录 CloudBase..."
-          tcb login --apiKeyId $CLOUDBASE_SECRET_ID --apiKey $CLOUDBASE_SECRET_KEY
+          # 使用环境变量方式认证（非交互式）
+          echo "配置 CloudBase 认证信息..."
+          
+          # 创建配置目录
+          mkdir -p ~/.cloudbase
+          
+          # 写入认证配置
+          cat > ~/.cloudbase/config.json << EOF
+          {
+            "secretId": "$CLOUDBASE_SECRET_ID",
+            "secretKey": "$CLOUDBASE_SECRET_KEY",
+            "envId": "$CLOUDBASE_ENV_ID"
+          }
+          EOF
+          
+          echo "✅ 认证配置完成"
           
           # 确认登录状态
-          echo "检查登录状态..."
+          echo "检查环境信息..."
+          tcb env:list || echo "环境列表获取失败，继续尝试部署"
           
           # 部署前后端
           echo "开始部署项目..."
-          echo "Y" | tcb framework deploy --verbose
+          echo "Y" | tcb framework deploy --envId $CLOUDBASE_ENV_ID --verbose
           
           echo "✅ 部署完成！"
-      
+
       - name: 部署结果通知
         if: always()
         run: |
@@ -55,4 +70,3 @@ jobs:
           else
             echo "❌ 部署失败，请查看日志"
           fi
-
