@@ -83,22 +83,6 @@ git push -u origin main
 
 ---
 
-## 配置 GitHub Secrets（用于 CloudBase 自动部署）
-
-如果您计划使用 GitHub Actions 自动部署到 CloudBase，需要配置以下 Secrets：
-
-1. 进入仓库的 **Settings** → **Secrets and variables** → **Actions**
-2. 点击 **New repository secret**
-3. 添加以下 Secrets：
-
-| Secret 名称          | 说明                | 获取方式                           |
-| -------------------- | ------------------- | ---------------------------------- |
-| `TENCENT_SECRET_ID`  | 腾讯云 API 密钥 ID  | 腾讯云控制台 → 访问管理 → 访问密钥 |
-| `TENCENT_SECRET_KEY` | 腾讯云 API 密钥 Key | 同上                               |
-| `ENV_ID`             | CloudBase 环境 ID   | CloudBase 控制台 → 环境列表        |
-
----
-
 ## 后续操作
 
 ### 1. 保护 main 分支
@@ -109,11 +93,7 @@ git push -u origin main
 - ✅ Require a pull request before merging
 - ✅ Require status checks to pass before merging
 
-### 2. 配置 GitHub Actions
-
-项目已包含 `.github/workflows/deploy.yml`（待创建），推送后会自动触发部署流程。
-
-### 3. 添加协作者
+### 2. 添加协作者
 
 **Settings** → **Collaborators** → **Add people**
 
