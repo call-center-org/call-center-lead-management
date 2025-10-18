@@ -250,19 +250,45 @@ zeabur auth login
 zeabur deploy
 ```
 
+## 📚 项目文档
+
+完整的项目文档位于 `docs/` 目录：
+
+- **[PRD - 产品需求文档](./docs/PRD.md)** - 完整的产品需求定义
+  - 产品背景与目标
+  - 4 个核心页面详细需求
+  - 16 个标签规则
+  - 业务规则与计算公式
+  - 数据库表设计
+
+- **[MILESTONE_TRACKING - 里程碑跟踪](./docs/MILESTONE_TRACKING.md)** - 开发进度监控
+  - M0-M4 完整规划
+  - 当前进度：M0 ✅ 已完成，M1 🔄 进行中
+  - 详细任务清单（33 个任务）
+  - 验收标准
+  - 时间规划
+
+- **[ZEABUR_DEPLOY - 部署指南](./ZEABUR_DEPLOY.md)** - Zeabur 部署说明
+
 ## 🤝 贡献
 
 欢迎提交 Issue 和 Pull Request！
 
-## 📝 待办事项
+## 📝 里程碑进度
 
-- [x] 前端项目初始化
-- [x] 基础组件开发
-- [x] 后端 API 开发
-- [x] 数据库表结构创建
-- [x] Zeabur 部署配置
-- [x] 单元测试编写
-- [ ] API 文档完善
+当前阶段：**M1 - Cursor 骨架**（0%）
+
+- [x] M0：Figma 低保真（已完成）
+- [ ] M1：Cursor 骨架（进行中）
+  - [ ] 前端项目搭建
+  - [ ] 后端项目搭建
+  - [ ] 4 个页面骨架
+  - [ ] 基础 API 接口
+- [ ] M2：任务逻辑
+- [ ] M3：计算器
+- [ ] M4：报表与告警
+
+详细进度请查看：[MILESTONE_TRACKING.md](./docs/MILESTONE_TRACKING.md)
 
 ## 📄 许可证
 
