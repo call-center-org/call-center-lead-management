@@ -1,6 +1,18 @@
 # 线索数据包管理系统
 
-呼叫中心线索数据包管理系统，用于管理外呼任务、线索数据包和通话记录分析。
+> **Call Center Organization** 的子系统 - 线索采买、任务管理、成本分析
+
+---
+
+## 🏠 项目定位
+
+本系统是 [Call Center Organization](https://github.com/call-center-org) 微服务架构中的**核心业务系统**之一。
+
+**如果你是第一次接触本项目**，建议先阅读：
+- 📚 [Organization 总体介绍](https://github.com/call-center-org) - 了解整体架构
+- 📖 然后回到本 README 了解线索管理系统的具体信息
+
+---
 
 ## 📋 项目简介
 
@@ -257,7 +269,7 @@ zeabur deploy
 ### 📋 核心原则
 
 1. **唯一的需求来源**
-   - ✅ [`docs/PRD.md`](./docs/PRD.md) 是唯一的产品需求文档
+   - ✅ [`docs/线索管理系统_PRD.md`](./docs/线索管理系统_PRD.md) 是唯一的产品需求文档
    - ✅ 所有功能必须以 PRD 为准，不得擅自修改需求
    - ❌ 不要根据猜测或假设进行开发
 
@@ -274,7 +286,7 @@ zeabur deploy
 ### 🎯 开发流程（必须遵守）
 
 **开发前：**
-1. 📖 阅读 [`docs/PRD.md`](./docs/PRD.md) 确认需求
+1. 📖 阅读 [`docs/线索管理系统_PRD.md`](./docs/线索管理系统_PRD.md) 确认需求
 2. 📋 查看 [`docs/MILESTONE_TRACKING.md`](./docs/MILESTONE_TRACKING.md) 了解当前任务
 3. 🔍 检查验收标准
 
@@ -300,7 +312,7 @@ zeabur deploy
 
 如果你是 AI（Cursor/Claude 等）：
 1. **每次对话开始时**，必须先阅读 `docs/MILESTONE_TRACKING.md` 了解当前进度
-2. **做任何开发决策前**，必须先参考 `docs/PRD.md` 确认需求
+2. **做任何开发决策前**，必须先参考 `docs/线索管理系统_PRD.md` 确认需求
 3. **完成任务后**，必须更新 `docs/MILESTONE_TRACKING.md`
 4. **不要**根据记忆或猜测，**一切以文档为准**
 
@@ -309,7 +321,7 @@ zeabur deploy
 ```
 call-center-lead-management/
 ├── docs/
-│   ├── PRD.md                    ← 📖 产品需求（必读）
+│   ├── 线索管理系统_PRD.md       ← 📖 产品需求（必读）
 │   └── MILESTONE_TRACKING.md     ← 📊 进度跟踪（必读，频繁更新）
 ├── README.md                     ← 📚 项目入口（当前文件）
 └── ...
@@ -321,7 +333,7 @@ call-center-lead-management/
 
 完整的项目文档位于 `docs/` 目录：
 
-- **[PRD - 产品需求文档](./docs/PRD.md)** - 完整的产品需求定义
+- **[线索管理系统_PRD - 产品需求文档](./docs/线索管理系统_PRD.md)** - 完整的产品需求定义
   - 产品背景与目标
   - 4 个核心页面详细需求
   - 16 个标签规则
