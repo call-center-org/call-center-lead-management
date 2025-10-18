@@ -250,6 +250,73 @@ zeabur auth login
 zeabur deploy
 ```
 
+## ⚠️ 开发必读
+
+> **🚨 重要提醒：所有开发人员（包括 AI）必须阅读并严格遵循以下规则**
+
+### 📋 核心原则
+
+1. **唯一的需求来源**
+   - ✅ [`docs/PRD.md`](./docs/PRD.md) 是唯一的产品需求文档
+   - ✅ 所有功能必须以 PRD 为准，不得擅自修改需求
+   - ❌ 不要根据猜测或假设进行开发
+
+2. **唯一的里程碑划分**
+   - ✅ 使用 **M0-M4** 里程碑（来自 PRD）
+   - ❌ 不要使用 Phase、Sprint 或其他划分方式
+   - ✅ 当前阶段：**M0 已完成，M1 进行中**
+
+3. **唯一的进度跟踪文档**
+   - ✅ [`docs/MILESTONE_TRACKING.md`](./docs/MILESTONE_TRACKING.md) 是唯一的进度跟踪文档
+   - ✅ 完成任务后必须立即更新此文档（将 `[ ]` 改为 `[x]`）
+   - ✅ 定期更新进度百分比
+
+### 🎯 开发流程（必须遵守）
+
+**开发前：**
+1. 📖 阅读 [`docs/PRD.md`](./docs/PRD.md) 确认需求
+2. 📋 查看 [`docs/MILESTONE_TRACKING.md`](./docs/MILESTONE_TRACKING.md) 了解当前任务
+3. 🔍 检查验收标准
+
+**开发中：**
+1. 🚫 不要偏离 PRD 定义的需求
+2. 🚫 不要跳过 M1 直接开发 M2/M3/M4 的功能
+3. ✅ 有疑问立即查阅 PRD 和 MILESTONE_TRACKING
+
+**开发后：**
+1. ✅ 更新 [`docs/MILESTONE_TRACKING.md`](./docs/MILESTONE_TRACKING.md)
+2. ✅ 标记已完成的任务 `[x]`
+3. ✅ 更新进度百分比
+4. ✅ 提交 Git 时引用任务编号
+
+### 📅 文档更新频率
+
+| 阶段 | 更新频率 | 说明 |
+|------|---------|------|
+| M1 | 每 2 天 | 任务较多，需密切跟踪 |
+| M2-M4 | 每周 | 每周五更新进度 |
+
+### 🤖 AI 协作规则
+
+如果你是 AI（Cursor/Claude 等）：
+1. **每次对话开始时**，必须先阅读 `docs/MILESTONE_TRACKING.md` 了解当前进度
+2. **做任何开发决策前**，必须先参考 `docs/PRD.md` 确认需求
+3. **完成任务后**，必须更新 `docs/MILESTONE_TRACKING.md`
+4. **不要**根据记忆或猜测，**一切以文档为准**
+
+### 📂 关键文件位置
+
+```
+call-center-lead-management/
+├── docs/
+│   ├── PRD.md                    ← 📖 产品需求（必读）
+│   └── MILESTONE_TRACKING.md     ← 📊 进度跟踪（必读，频繁更新）
+├── README.md                     ← 📚 项目入口（当前文件）
+└── ...
+```
+
+---
+
 ## 📚 项目文档
 
 完整的项目文档位于 `docs/` 目录：
