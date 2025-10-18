@@ -11,7 +11,7 @@ from app.models import LeadPackage, User
 
 def generate_test_packages():
     """生成测试数据包"""
-    
+
     # 测试数据配置
     test_packages = [
         {
@@ -125,7 +125,7 @@ def generate_test_packages():
             "interest_rate": 0.35,
         },
     ]
-    
+
     packages = []
     for data in test_packages:
         # 检查是否已存在同名数据包
@@ -133,21 +133,21 @@ def generate_test_packages():
         if existing:
             print(f"⚠️  数据包 '{data['name']}' 已存在，跳过")
             continue
-        
+
         # 创建数据包
         package = LeadPackage(**data)
-        
+
         # 计算指标
         package.calculate_metrics()
-        
+
         # 随机设置创建时间（过去7天内）
         days_ago = random.randint(0, 7)
         package.created_at = datetime.utcnow() - timedelta(days=days_ago)
         package.updated_at = package.created_at
-        
+
         packages.append(package)
         print(f"✅ 创建数据包: {data['name']} (线索数: {data['total_leads']})")
-    
+
     return packages
 
 
@@ -155,17 +155,17 @@ def seed_database():
     """填充测试数据"""
     print("🚀 开始生成测试数据...")
     print("=" * 60)
-    
+
     # 生成测试数据包
     packages = generate_test_packages()
-    
+
     if not packages:
         print("\n⚠️  没有新数据包需要添加")
         return
-    
+
     # 批量添加
     db.session.add_all(packages)
-    
+
     try:
         db.session.commit()
         print("=" * 60)
@@ -173,7 +173,9 @@ def seed_database():
         print("\n📊 数据统计:")
         print(f"   总线索数: {sum(p.total_leads for p in packages):,}")
         print(f"   总成本: ¥{sum(p.total_cost for p in packages):,.2f}")
-        print(f"   平均接通率: {sum(p.contact_rate for p in packages) / len(packages) * 100:.1f}%")
+        print(
+            f"   平均接通率: {sum(p.contact_rate for p in packages) / len(packages) * 100:.1f}%"
+        )
     except Exception as e:
         db.session.rollback()
         print(f"❌ 添加失败: {str(e)}")
@@ -183,18 +185,18 @@ def seed_database():
 def clear_test_data():
     """清除所有测试数据（谨慎使用）"""
     print("⚠️  警告：即将清除所有数据包...")
-    
+
     count = LeadPackage.query.delete()
     db.session.commit()
-    
+
     print(f"✅ 已清除 {count} 个数据包")
 
 
 if __name__ == "__main__":
     import sys
-    
+
     app = create_app("production")
-    
+
     with app.app_context():
         if len(sys.argv) > 1 and sys.argv[1] == "--clear":
             # 清除数据模式
@@ -206,4 +208,3 @@ if __name__ == "__main__":
         else:
             # 生成测试数据
             seed_database()
-

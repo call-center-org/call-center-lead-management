@@ -23,10 +23,10 @@ def seed_test_data():
     # 获取当前用户
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
-    
+
     if not user:
         return jsonify({"success": False, "message": "用户不存在"}), 404
-    
+
     # 测试数据配置
     test_packages = [
         {
@@ -129,80 +129,94 @@ def seed_test_data():
             "interest_rate": 0.35,
         },
     ]
-    
+
     packages_created = []
     packages_skipped = []
-    
+
     for data in test_packages:
         # 检查是否已存在
         existing = LeadPackage.query.filter_by(name=data["name"]).first()
         if existing:
             packages_skipped.append(data["name"])
             continue
-        
+
         # 创建数据包
         package = LeadPackage(**data)
         package.calculate_metrics()
-        
+
         # 随机设置创建时间（过去7天内）
         days_ago = random.randint(0, 7)
         package.created_at = datetime.utcnow() - timedelta(days=days_ago)
         package.updated_at = package.created_at
-        
+
         db.session.add(package)
         packages_created.append(data["name"])
-    
+
     try:
         db.session.commit()
-        
+
         # 统计信息
         all_packages = LeadPackage.query.all()
         total_leads = sum(p.total_leads for p in all_packages)
         total_cost = sum(p.total_cost for p in all_packages)
-        avg_contact_rate = sum(p.contact_rate for p in all_packages) / len(all_packages) if all_packages else 0
-        
-        return jsonify({
-            "success": True,
-            "message": "测试数据生成成功",
-            "data": {
-                "created": len(packages_created),
-                "skipped": len(packages_skipped),
-                "created_packages": packages_created,
-                "skipped_packages": packages_skipped,
-                "statistics": {
-                    "total_packages": len(all_packages),
-                    "total_leads": total_leads,
-                    "total_cost": round(total_cost, 2),
-                    "avg_contact_rate": round(avg_contact_rate * 100, 1),
+        avg_contact_rate = (
+            sum(p.contact_rate for p in all_packages) / len(all_packages)
+            if all_packages
+            else 0
+        )
+
+        return (
+            jsonify(
+                {
+                    "success": True,
+                    "message": "测试数据生成成功",
+                    "data": {
+                        "created": len(packages_created),
+                        "skipped": len(packages_skipped),
+                        "created_packages": packages_created,
+                        "skipped_packages": packages_skipped,
+                        "statistics": {
+                            "total_packages": len(all_packages),
+                            "total_leads": total_leads,
+                            "total_cost": round(total_cost, 2),
+                            "avg_contact_rate": round(avg_contact_rate * 100, 1),
+                        },
+                    },
                 }
-            }
-        }), 200
-        
+            ),
+            200,
+        )
+
     except Exception as e:
         db.session.rollback()
-        return jsonify({
-            "success": False,
-            "message": f"生成测试数据失败: {str(e)}"
-        }), 500
+        return (
+            jsonify({"success": False, "message": f"生成测试数据失败: {str(e)}"}),
+            500,
+        )
 
 
 @admin_bp.route("/stats", methods=["GET"])
 @jwt_required()
 def get_stats():
     """获取系统统计信息"""
-    
+
     packages = LeadPackage.query.all()
     users = User.query.all()
-    
-    return jsonify({
-        "success": True,
-        "data": {
-            "total_packages": len(packages),
-            "total_users": len(users),
-            "total_leads": sum(p.total_leads for p in packages),
-            "total_cost": sum(p.total_cost for p in packages),
-        }
-    }), 200
+
+    return (
+        jsonify(
+            {
+                "success": True,
+                "data": {
+                    "total_packages": len(packages),
+                    "total_users": len(users),
+                    "total_leads": sum(p.total_leads for p in packages),
+                    "total_cost": sum(p.total_cost for p in packages),
+                },
+            }
+        ),
+        200,
+    )
 
 
 @admin_bp.route("/clear-all-packages", methods=["POST"])
@@ -213,26 +227,24 @@ def clear_all_packages():
     需要在请求体中确认
     """
     data = request.get_json()
-    
+
     if not data or data.get("confirm") != "yes":
-        return jsonify({
-            "success": False,
-            "message": "需要确认操作，请在请求体中设置 confirm: 'yes'"
-        }), 400
-    
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "message": "需要确认操作，请在请求体中设置 confirm: 'yes'",
+                }
+            ),
+            400,
+        )
+
     try:
         count = LeadPackage.query.delete()
         db.session.commit()
-        
-        return jsonify({
-            "success": True,
-            "message": f"已清除 {count} 个数据包"
-        }), 200
-        
+
+        return jsonify({"success": True, "message": f"已清除 {count} 个数据包"}), 200
+
     except Exception as e:
         db.session.rollback()
-        return jsonify({
-            "success": False,
-            "message": f"清除失败: {str(e)}"
-        }), 500
-
+        return jsonify({"success": False, "message": f"清除失败: {str(e)}"}), 500
